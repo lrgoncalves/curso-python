@@ -2,12 +2,30 @@
 from abc import ABCMeta, abstractmethod
 
 class Imposto(object):
-    """docstring for Imposto"""
+    
     __metaclass__ = ABCMeta
+
+    def __init__(self, outro_imposto = None):
+        self.__outro_imposto = outro_imposto
+
+    def calculo_do_outro_imposto(self, orcamento):
+        if (self.__outro_imposto is None):
+            return 0
+        else:
+            return self.__outro_imposto.calcula(orcamento)
 
     @abstractmethod
     def calcula(self, orcamento):
         pass
+
+class ImpostoTemplate(Imposto):
+    __metaclass__ = ABCMeta
+
+    def calcula(self, orcamento):
+        if self.verifica_taxa_maxima(orcamento):
+            return self.aplica_taxa_maxima(orcamento) + self.calculo_do_outro_imposto(orcamento)
+        else:
+            return self.aplica_taxa_minima(orcamento) + self.calculo_do_outro_imposto(orcamento)
 
     @abstractmethod
     def verifica_taxa_maxima(self, orcamento):
@@ -21,20 +39,7 @@ class Imposto(object):
     def aplica_taxa_minima(self, orcamento):
         pass;
 
-class ICMS(object):
-    def calcula(self, orcamento):
-        return orcamento.valor * 0.1
-
-class ISS(object):
-    def calcula(self, orcamento):
-        return orcamento.valor * 0.06
-
-class ICPP(Imposto):
-    def calcula(self, orcamento):
-        if self.verifica_taxa_maxima(orcamento):
-            return self.aplica_taxa_maxima(orcamento)
-        else:
-            return self.aplica_taxa_minima(orcamento)
+class ICPP(ImpostoTemplate):
 
     def verifica_taxa_maxima(self, orcamento):
         return (orcamento.valor > 500)
@@ -45,12 +50,7 @@ class ICPP(Imposto):
     def aplica_taxa_minima(self, orcamento):
         return orcamento.valor * 0.05
 
-class IKCV(Imposto):
-    def calcula(self, orcamento):
-        if self.verifica_taxa_maxima(orcamento):
-            return self.aplica_taxa_maxima(orcamento)
-        else:
-            return self.aplica_taxa_minima(orcamento)
+class IKCV(ImpostoTemplate):
 
     def verifica_taxa_maxima(self, orcamento):
         return (orcamento.valor > 500 and self.__tem_item_maior_que_100_reais(orcamento))
@@ -66,3 +66,11 @@ class IKCV(Imposto):
             if (item.valor > 100):
                 return true
             return false
+
+class ICMS(Imposto):
+    def calcula(self, orcamento):
+        return orcamento.valor * 0.1 + self.calculo_do_outro_imposto(orcamento)
+
+class ISS(Imposto):
+    def calcula(self, orcamento):
+        return orcamento.valor * 0.06 + self.calculo_do_outro_imposto(orcamento)

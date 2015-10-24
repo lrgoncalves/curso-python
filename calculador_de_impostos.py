@@ -23,7 +23,17 @@ if __name__ == '__main__':
     calculador_de_impostos.realiza_calculo(orcamento, ISS())
     calculador_de_impostos.realiza_calculo(orcamento, ICMS())
 
+    print 'ISS_com_ICMS'
+    # veja, não é necessária mais uma classe. Imposto recebe outro em seu construtor
+    ISS_com_ICMS = ISS(ICMS())
+    calculador_de_impostos.realiza_calculo(orcamento, ISS_com_ICMS)
+
     # cálculo dos novos impostos
     print 'ICPP e IKCV'
     calculador_de_impostos.realiza_calculo(orcamento, ICPP()) # imprime 25.0
     calculador_de_impostos.realiza_calculo(orcamento, IKCV()) # imprime 30.0
+
+    print 'ICPP_com_IKCV'
+    # veja, não é necessária mais uma classe. Imposto recebe outro em seu construtor
+    ICPP_com_IKCV = ICPP(IKCV())
+    calculador_de_impostos.realiza_calculo(orcamento, ICPP_com_IKCV)
